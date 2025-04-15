@@ -18,10 +18,10 @@ async function renderClippedPages() {
   try {
     // Get all clipped pages from IndexedDB
     const pages = await WebpageClipperDB.getAllPages();
-    
+
     // Clear the container
     clipContainer.innerHTML = '';
-    
+
     if (pages.length === 0) {
       // Show a message if there are no clipped pages
       clipContainer.innerHTML = `
@@ -32,33 +32,42 @@ async function renderClippedPages() {
       `;
       return;
     }
-    
+
     // Create the list element
     const listElement = document.createElement('div');
     listElement.className = 'clip-list';
-    
+
     // Sort pages by timestamp, newest first
     pages.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-    
+
     // Add each page to the list
     pages.forEach(page => {
       const clipItem = document.createElement('div');
       clipItem.className = 'clip-item';
       clipItem.innerHTML = `
-        <div class="clip-title">${page.title}</div>
-        <a href="${page.url}" class="clip-url" target="_blank">${page.url}</a>
-        <div class="clip-date">${formatDate(page.timestamp)}</div>
-        <div class="clip-content">${page.content}</div>
-        <button class="delete-btn" data-id="${page.id}">×</button>
-      `;
-      
+      <div class="clip-title">
+        ${page.favicon ? `<img src="${page.favicon}" class="favicon" onerror="this.style.display='none'">` : ''}
+        ${page.title}
+      </div>
+      <a href="${page.url}" class="clip-url" target="_blank">${page.url}</a>
+      <div class="clip-date">${formatDate(page.timestamp)}</div>
+      ${page.wordCount ? `
+      <div class="clip-metadata">
+        <div class="metadata-item">Words: ${page.wordCount}</div>
+        <div class="metadata-item">Reading time: ${page.readingTime} min</div>
+      </div>
+      ` : ''}
+      <div class="clip-content">${page.content}</div>
+      <button class="delete-btn" data-id="${page.id}">×</button>
+    `;
+
       // Add the item to the list
       listElement.appendChild(clipItem);
     });
-    
+
     // Add the list to the container
     clipContainer.appendChild(listElement);
-    
+
     // Add event listeners for delete buttons
     const deleteButtons = document.querySelectorAll('.delete-btn');
     deleteButtons.forEach(btn => {
@@ -73,7 +82,7 @@ async function renderClippedPages() {
         }
       });
     });
-    
+
   } catch (error) {
     console.error('Error rendering clipped pages:', error);
     clipContainer.innerHTML = `
