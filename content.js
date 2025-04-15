@@ -10,9 +10,18 @@ function extractTextContent(doc) {
   
   // Limit to first 100 words
   const words = bodyText.split(/\s+/);
+  const wordCount = words.length;
+
+  //calculate the reading time
+  const readingTime = Math.ceil(wordCount/200);
+
   const firstHundredWords = words.slice(0, 100).join(' ');
   
-  return firstHundredWords + (words.length > 100 ? '...' : '');
+  return {
+    content: firstHundredWords,
+    wordCount: wordCount,
+    readingTime: readingTime
+  };
 }
 
 // Function to clip the current page
