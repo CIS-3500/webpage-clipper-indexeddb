@@ -26,11 +26,24 @@ function extractTextContent(doc) {
 
 // Function to clip the current page
 function clipCurrentPage() {
+  // Get favicon URL (if available)
+  let faviconUrl = '';
+  const faviconLink = document.querySelector('link[rel="icon"], link[rel="shortcut icon"]');
+  if (faviconLink) {
+    faviconUrl = faviconLink.href;
+  }
+  
+  // Extract text content with metrics
+  const textData = extractTextContent(document);
+  
   const pageData = {
     title: document.title,
     url: window.location.href,
     timestamp: new Date().toISOString(),
-    content: extractTextContent(document)
+    content: textData.content,
+    favicon: faviconUrl,
+    wordCount: textData.wordCount,
+    readingTime: textData.readingTime
   };
   
   // Send the data to the background script
