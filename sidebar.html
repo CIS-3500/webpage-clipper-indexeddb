@@ -1,131 +1,151 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Clipped Pages</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      padding: 15px;
-      background-color: #f5f5f5;
-    }
-    
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-      position: sticky;
-      top: 0;
-      background-color: #f5f5f5;
-      padding: 10px 0;
-      z-index: 10;
-    }
-    
-    h1 {
-      margin: 0;
-      font-size: 20px;
-    }
-    
-    .clear-btn {
-      background-color: #f44336;
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    
-    .no-clips {
-      text-align: center;
-      color: #666;
-      margin-top: 40px;
-    }
-    
-    .clip-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    
-    .clip-item {
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.12);
-      padding: 15px;
-      position: relative;
-    }
-    
-    .clip-title {
-      font-weight: bold;
-      margin-bottom: 5px;
-      padding-right: 25px;
-    }
-    
-    .clip-url {
-      font-size: 12px;
-      color: #1a73e8;
-      text-decoration: none;
-      word-break: break-all;
-      margin-bottom: 5px;
-      display: block;
-    }
-    
-    .clip-date {
-      font-size: 11px;
-      color: #666;
-      margin-bottom: 8px;
-    }
-    
-    .clip-content {
-      font-size: 13px;
-      color: #333;
-      line-height: 1.4;
-      margin-top: 10px;
-      border-top: 1px solid #eee;
-      padding-top: 10px;
-    }
-    
-    .delete-btn {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      background: none;
-      border: none;
-      color: #888;
-      cursor: pointer;
-      font-size: 16px;
-      padding: 0;
-      width: 20px;
-      height: 20px;
-      line-height: 1;
-    }
-    
-    .delete-btn:hover {
-      color: #f44336;
-    }
-    
-    .loading {
-      text-align: center;
-      color: #666;
-      margin-top: 40px;
-    }
-  </style>
-</head>
-<body>
-  <div class="header">
-    <h1>Clipped Pages</h1>
-    <button id="clearAllBtn" class="clear-btn">Clear All</button>
-  </div>
-  
-  <div id="clipContainer">
-    <div class="loading">Loading clipped pages...</div>
-  </div>
-  
-  <!-- Load the IndexedDB utility first -->
-  <script src="utils/db.js"></script>
-  <script src="sidebar.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clipped Pages</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 15px;
+        background-color: #f5f5f5;
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        position: sticky;
+        top: 0;
+        background-color: #f5f5f5;
+        padding: 10px 0;
+        z-index: 10;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 20px;
+      }
+
+      .clear-btn {
+        background-color: #f44336;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .no-clips {
+        text-align: center;
+        color: #666;
+        margin-top: 40px;
+      }
+
+      .clip-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .clip-item {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+        padding: 15px;
+        position: relative;
+      }
+
+      .clip-title {
+        font-weight: bold;
+        margin-bottom: 5px;
+        padding-right: 25px;
+      }
+
+      .clip-url {
+        font-size: 12px;
+        color: #1a73e8;
+        text-decoration: none;
+        word-break: break-all;
+        margin-bottom: 5px;
+        display: block;
+      }
+
+      .clip-date {
+        font-size: 11px;
+        color: #666;
+        margin-bottom: 8px;
+      }
+
+      .clip-content {
+        font-size: 13px;
+        color: #333;
+        line-height: 1.4;
+        margin-top: 10px;
+        border-top: 1px solid #eee;
+        padding-top: 10px;
+      }
+
+      .clip-metadata {
+        display: flex;
+        gap: 15px;
+        font-size: 11px;
+        color: #666;
+        margin-top: 5px;
+      }
+
+      .metadata-item {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+      }
+
+      .favicon {
+        width: 16px;
+        height: 16px;
+        margin-right: 5px;
+      }
+
+      .delete-btn {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: none;
+        border: none;
+        color: #888;
+        cursor: pointer;
+        font-size: 16px;
+        padding: 0;
+        width: 20px;
+        height: 20px;
+        line-height: 1;
+      }
+
+      .delete-btn:hover {
+        color: #f44336;
+      }
+
+      .loading {
+        text-align: center;
+        color: #666;
+        margin-top: 40px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>Clipped Pages</h1>
+      <button id="clearAllBtn" class="clear-btn">Clear All</button>
+    </div>
+
+    <div id="clipContainer">
+      <div class="loading">Loading clipped pages...</div>
+    </div>
+
+    <!-- Load the IndexedDB utility first -->
+    <script src="utils/db.js"></script>
+    <script src="sidebar.js"></script>
+  </body>
 </html>
