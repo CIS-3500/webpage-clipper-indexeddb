@@ -41,6 +41,7 @@ async function renderClippedPages() {
     pages.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
     
     // Add each page to the list
+    // <div class ="clip-wordcount>${page.wordcount}</div>"
     pages.forEach(page => {
       const clipItem = document.createElement('div');
       clipItem.className = 'clip-item';
@@ -48,7 +49,14 @@ async function renderClippedPages() {
         <div class="clip-title">${page.title}</div>
         <a href="${page.url}" class="clip-url" target="_blank">${page.url}</a>
         <div class="clip-date">${formatDate(page.timestamp)}</div>
-        <div class="clip-content">${page.content}</div>
+        <div class="clip-content">
+          <ul style="padding-left: 16px; margin-top: 0;">
+            ${(page.links || []).map(link => `
+              <li><a href="${link.href}" target="_blank">${link.text || link.href}</a></li>
+            `).join('')}
+          </ul>
+        </div>
+        <div class="clip-wordcount">Total links: ${page.linkCount}</div>
         <button class="delete-btn" data-id="${page.id}">×</button>
       `;
       
