@@ -55,6 +55,7 @@ function handleExtractSelection() {
 
 // --- message listener ---
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  console.log('[Content] Received message:', message.action);
   if (message.action === 'ping') {
     sendResponse({ success: true });
     return;

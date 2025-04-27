@@ -1,11 +1,11 @@
 /**
- * Sidebar script for the Webpage Clipper extension
- * Handles displaying and managing clipped pages using IndexedDB
+ * Sidebar script for the Hyperlink Extractor extension
+ * Handles displaying and managing extract hyperlinks using IndexedDB
  */
 
 // Elements
-const clipContainer = document.getElementById('clipContainer');
-const clearAllBtn   = document.getElementById('clearAllBtn');
+const groupContainer = document.getElementById('groupContainer');
+const clearAllBtn = document.getElementById('clearAllBtn');
 
 // Format ISO timestamp → human date/time
 function formatDate(dateString) {
@@ -13,211 +13,166 @@ function formatDate(dateString) {
   return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
 }
 
-// Main render function
-async function renderClippedPages() {
+// Crop a paragraph snippet nicely
+function cropSnippet(snippetText) {
+  const words = snippetText.split(/\s+/);
+  if (words.length <= 10) {
+    return snippetText;
+  }
+  return `${words.slice(0, 5).join(' ')} ... ${words.slice(-5).join(' ')}`;
+}
+
+// Render all extracted pages
+async function renderExtractedPages() {
   try {
-    // 1) Fetch everything
-    const pages = await WebpageClipperDB.getAllPages();
-    clipContainer.innerHTML = '';
+    const pages = await HyperlinkExtractorDB.getAllPages(); // <-- DB call
+    groupContainer.innerHTML = '';
 
     if (!pages.length) {
-      clipContainer.innerHTML = `
-        <div class="no-clips">
-          <p>No pages clipped yet</p>
-          <p>Click "Clip Current Page" in the popup to save a webpage</p>
+      groupContainer.innerHTML = `
+        <div class="no-data">
+          <p>No hyperlinks extracted yet.</p>
         </div>
       `;
       return;
     }
 
-    // 2) Group by URL
+    // Group pages by URL
     const groups = pages.reduce((acc, page) => {
       const key = page.url;
       (acc[key] = acc[key] || []).push(page);
       return acc;
     }, {});
 
-    // 3) Build an array of groups sorted by each group’s latest extraction (newest first)
+    // Sort groups by latest timestamp
     const sortedGroups = Object.values(groups)
-    .map(group => {
-      // sort each group newest→oldest
-      group.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-      return group;
-    })
-    .sort((g1, g2) => {
-      // compare the first (newest) timestamp in each
-      return new Date(g2[0].timestamp) - new Date(g1[0].timestamp);
-    });
+      .map(group => {
+        group.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        return group;
+      })
+      .sort((g1, g2) => new Date(g2[0].timestamp) - new Date(g1[0].timestamp));
 
-    // 4) Now render in that order
     sortedGroups.forEach(groupPages => {
-      // sort newest→oldest
-      groupPages.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-
-      // group container
       const groupDiv = document.createElement('div');
       groupDiv.className = 'page-group';
 
-      // big title (once per URL)
+      // Big Title (Page Title)
       const titleDiv = document.createElement('div');
       titleDiv.className = 'group-title';
       titleDiv.textContent = groupPages[0].title;
       groupDiv.appendChild(titleDiv);
 
-      // one entry per extraction
+      // URL
+      const urlDiv = document.createElement('a');
+      urlDiv.className = 'group-url';
+      urlDiv.href = groupPages[0].url;
+      urlDiv.target = '_blank';
+      urlDiv.textContent = groupPages[0].url;
+      groupDiv.appendChild(urlDiv);
+
+      // Render each extraction under this URL
       groupPages.forEach(page => {
         const entry = document.createElement('div');
         entry.className = 'extraction-item';
 
-        // delete button
-        const delBtn = document.createElement('button');
-        delBtn.className = 'delete-btn';
-        delBtn.dataset.id = page.id;
-        delBtn.textContent = '×';
-        entry.appendChild(delBtn);
-
-        // timestamp
+        // Timestamp
         const dateDiv = document.createElement('div');
-        dateDiv.className = 'clip-date';
+        dateDiv.className = 'group-meta';
         dateDiv.textContent = formatDate(page.timestamp);
         entry.appendChild(dateDiv);
 
-        // snippet: first 2 + last 2 link texts
-        const texts = (page.links || []).map(l => l.text || l.href);
-        const preview = texts.length <= 4
-          ? texts.join(' • ')
-          : texts.slice(0,2).join(' • ') + ' … ' + texts.slice(-2).join(' • ');
-        const snipDiv = document.createElement('div');
-        snipDiv.className = 'clip-snippet';
-        snipDiv.textContent = preview;
-        entry.appendChild(snipDiv);
+        // Snippet
+        const snippetDiv = document.createElement('div');
+        snippetDiv.className = 'snippet-preview';
+        snippetDiv.textContent = (page.snippet === "Full Page") ? "Full Page" : cropSnippet(page.snippet);
+        snippetDiv.title = page.snippet; // Hover shows full paragraph
+        entry.appendChild(snippetDiv);
 
-        // link list + toggle
-        const contentDiv = document.createElement('div');
-        contentDiv.className = 'clip-content';
-        contentDiv.id = `clip-content-${page.id}`;
-
-        if (page.links.length > 10) {
-          const btn = document.createElement('button');
-          btn.className = 'toggle-btn';
-          btn.dataset.id = page.id;
-          btn.textContent = 'Show more';
-          contentDiv.appendChild(btn);
-        }
-
-        const ul = document.createElement('ul');
-        ul.className = 'link-list';
-        ul.style.cssText = 'padding-left:16px; margin-top:0; list-style:disc';
-        (page.links || []).slice(0,10).forEach(link => {
+        // Link List
+        const linkList = document.createElement('ul');
+        linkList.className = 'link-list';
+        (page.links || []).forEach(link => {
           const li = document.createElement('li');
+          li.className = 'link-item';
           li.innerHTML = `<a href="${link.href}" target="_blank">${link.text || link.href}</a>`;
-          ul.appendChild(li);
+          linkList.appendChild(li);
         });
-        contentDiv.appendChild(ul);
-        entry.appendChild(contentDiv);
-
-        // divider
-        const hr = document.createElement('hr');
-        hr.className = 'extraction-divider';
-        entry.appendChild(hr);
+        entry.appendChild(linkList);
 
         groupDiv.appendChild(entry);
+
+        // Divider
+        const divider = document.createElement('hr');
+        divider.className = 'extraction-divider';
+        groupDiv.appendChild(divider);
       });
 
-      clipContainer.appendChild(groupDiv);
-    });
-
-    // 4) Re-bind delete handlers
-    document.querySelectorAll('.delete-btn').forEach(btn => {
-      btn.addEventListener('click', async e => {
-        const id = parseInt(e.currentTarget.dataset.id, 10);
-        try {
-          await WebpageClipperDB.deletePage(id);
-          await renderClippedPages();
-        } catch (err) {
-          console.error('Error deleting page:', err);
-        }
-      });
-    });
-
-    // 5) Re-bind toggle handlers (closure over `pages`)
-    document.querySelectorAll('.toggle-btn').forEach(button => {
-      button.addEventListener('click', () => {
-        const id = button.dataset.id;
-        const contentDiv = document.getElementById(`clip-content-${id}`);
-        const listElement = contentDiv.querySelector('.link-list');
-        const fullPage = pages.find(p => p.id == id);
-        const fullList = fullPage?.links || [];
-
-        const isCollapsed = button.textContent === 'Show more';
-        if (isCollapsed) {
-          listElement.innerHTML = fullList.map(l => `
-            <li><a href="${l.href}" target="_blank">${l.text || l.href}</a></li>
-          `).join('');
-          button.textContent = 'Show less';
-          contentDiv.insertBefore(button, listElement);
-        } else {
-          listElement.innerHTML = fullList.slice(0,10).map(l => `
-            <li><a href="${l.href}" target="_blank">${l.text || l.href}</a></li>
-          `).join('');
-          button.textContent = 'Show more';
-          contentDiv.appendChild(button);
-        }
-      });
+      groupContainer.appendChild(groupDiv);
     });
 
   } catch (error) {
-    console.error('Error rendering clipped pages:', error);
-    clipContainer.innerHTML = `
-      <div class="no-clips">
-        <p>Error loading clipped pages</p>
+    console.error('Error rendering extracted pages:', error);
+    groupContainer.innerHTML = `
+      <div class="no-data">
+        <p>Error loading extracted pages</p>
         <p>${error.message}</p>
       </div>
     `;
   }
 }
 
-// Initialize DB + render on load
+// Initialize: load database + render
 async function initialize() {
   try {
-    await WebpageClipperDB.init();
-    await renderClippedPages();
+    await HyperlinkExtractorDB.init(); // <-- DB initialization
+    await renderExtractedPages();
   } catch (error) {
-    console.error('Error initializing database:', error);
-    clipContainer.innerHTML = `
-      <div class="no-clips">
-        <p>Error initializing database</p>
+    console.error('Error initializing sidebar:', error);
+    groupContainer.innerHTML = `
+      <div class="no-data">
+        <p>Error initializing storage</p>
         <p>${error.message}</p>
       </div>
     `;
   }
 }
 
-// Clear all pages
+// Clear all saved pages
 clearAllBtn.addEventListener('click', async () => {
-  if (confirm('Are you sure you want to delete all clipped pages?')) {
+  if (confirm('Are you sure you want to delete all extracted hyperlinks?')) {
     try {
-      await WebpageClipperDB.clearAllPages();
-      await renderClippedPages();
+      await HyperlinkExtractorDB.clearAllPages();
+      await renderExtractedPages();
     } catch (error) {
-      console.error('Error clearing pages:', error);
+      console.error('Error clearing extracted pages:', error);
     }
   }
 });
 
-// Listen for new clips from the background
-chrome.runtime.onMessage.addListener((message, sender) => {
-  if (message.action === 'newClip' && message.data) {
-    (async () => {
-      try {
-        await WebpageClipperDB.addPage(message.data);
-        await renderClippedPages();
-      } catch (error) {
-        console.error('Error adding new clip:', error);
-      }
-    })();
-  }
-});
+if (!window.hasHyperlinkExtractorSidebarListener) {
+  console.log('[Sidebar] Adding runtime.onMessage listener');
 
-// Kick things off
+  chrome.runtime.onMessage.addListener((message, sender) => {
+    console.log('[Sidebar] Received message:', message.action);
+
+    if (message.source === 'background' && (message.action === 'extractAllLinks' || message.action === 'extractLinksFromSelection') && message.data) {
+      console.log('[Sidebar] Attempting to add page to DB...');
+
+      (async () => {
+        try {
+          await HyperlinkExtractorDB.addPage(message.data);
+          console.log('[Sidebar] Successfully added page to DB');
+          await renderExtractedPages();
+          console.log('[Sidebar] Rendered extracted pages');
+        } catch (error) {
+          console.error('Error adding new extracted page:', error);
+        }
+      })();
+    }
+  });
+
+  window.hasHyperlinkExtractorSidebarListener = true;
+}
+
+// Kick off
 document.addEventListener('DOMContentLoaded', initialize);

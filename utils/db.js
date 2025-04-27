@@ -155,7 +155,7 @@ async function clearAllClippedPages() {
 }
 
 // Export the API
-window.WebpageClipperDB = {
+window.HyperlinkExtractorDB = {
   init: initDB,
   addPage: addClippedPage,
   getAllPages: getAllClippedPages,
