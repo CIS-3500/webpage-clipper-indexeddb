@@ -1,5 +1,5 @@
 /**
- * Background service worker for the Webpage Clipper extension
+ * Background service worker for the Hyperlink Extractor extension
  * Initializes the database and handles side panel setup
  */
 
@@ -11,7 +11,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   const { action, data } = message;
   if (action === 'extractAllLinks' || action === 'extractLinksFromSelection') {
     console.log(`[Background] forwarding "${action}" to sidebar`, data);
-    chrome.runtime.sendMessage({ action: 'newClip', data });
+    chrome.runtime.sendMessage({ action, data });
     sendResponse({ success: true });
   }
 });
@@ -85,4 +85,4 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   });
 });
 
-console.log('[Background] Webpage Clipper (link-extractor) background script loaded');
+console.log('[Background] Hyperlink Extractor background script loaded');

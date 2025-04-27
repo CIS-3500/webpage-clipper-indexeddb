@@ -9,13 +9,15 @@ function extractHyperLinks(root) {
 /**
  * Build the standard pageData object from a list of links
  */
-function buildPageData(links) {
+
+function buildPageData(links, snippet) {
   return {
     title: document.title,
     url: window.location.href,
     timestamp: new Date().toISOString(),
     links,
-    linkCount: links.length
+    linkCount: links.length,
+    snippet  
   };
 }
 
@@ -34,18 +36,21 @@ function sendLinkData(action, data) {
  */
 function handleExtractAll() {
   const links = extractHyperLinks(document);
-  sendLinkData('extractAllLinks', buildPageData(links));
+  sendLinkData('extractAllLinks', buildPageData(links, "Full Page"));
 }
 
 /**
  * Extract only from the user’s selection
  */
+
 function handleExtractSelection() {
   const sel = window.getSelection();
   if (!sel.rangeCount) return;
   const frag = sel.getRangeAt(0).cloneContents();
   const links = extractHyperLinks(frag);
-  sendLinkData('extractLinksFromSelection', buildPageData(links));
+
+  const selectedText = sel.toString().trim(); // capture selected text
+  sendLinkData('extractLinksFromSelection', buildPageData(links, selectedText));
 }
 
 // --- message listener ---

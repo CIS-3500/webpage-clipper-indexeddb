@@ -38,19 +38,19 @@
       cursor: pointer;
     }
     
-    .no-clips {
+    .no-data {
       text-align: center;
       color: #666;
       margin-top: 40px;
     }
     
-    .clip-list {
+    .group-container {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 15px;
     }
     
-    .clip-item {
+    .page-group {
       background-color: white;
       border-radius: 8px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.12);
@@ -58,59 +58,42 @@
       position: relative;
     }
     
-    .clip-title {
+    .group-title {
+      font-size: 1.2em;
       font-weight: bold;
-      margin-bottom: 5px;
-      padding-right: 25px;
+      margin-bottom: 0.5em;
+      color: #333;
     }
     
-    .clip-url {
-      font-size: 12px;
+    .group-url {
+      font-size: 0.85em;
       color: #1a73e8;
       text-decoration: none;
-      word-break: break-all;
-      margin-bottom: 5px;
+      word-break: break-word;
+      margin-bottom: 10px;
       display: block;
     }
     
-    .clip-date {
-      font-size: 11px;
+    .group-meta {
+      font-size: 0.75em;
       color: #666;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
     
-    .clip-content {
-      font-size: 13px;
-      color: #333;
-      line-height: 1.4;
+    .snippet-preview {
+      font-size: 0.9em;
+      color: #555;
+      margin-bottom: 10px;
+    }
+    
+    .link-list {
+      padding-left: 1em;
       margin-top: 10px;
-      border-top: 1px solid #eee;
-      padding-top: 10px;
-    }
-
-    .clip-wordcount {
-      font-size: 11px;
-      color: #666;
-      margin-bottom: 8px;
     }
     
-    .delete-btn {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      background: none;
-      border: none;
-      color: #888;
-      cursor: pointer;
-      font-size: 16px;
-      padding: 0;
-      width: 20px;
-      height: 20px;
-      line-height: 1;
-    }
-    
-    .delete-btn:hover {
-      color: #f44336;
+    .link-item {
+      margin-bottom: 5px;
+      font-size: 0.9em;
     }
     
     .loading {
@@ -118,34 +101,21 @@
       color: #666;
       margin-top: 40px;
     }
-
-    .page-group {
-      margin-bottom: 2em;
-    }
     
-    .group-title {
-      font-size: 1.3em;
-      font-weight: bold;
-      margin-bottom: 0.5em;
-      border-bottom: 2px solid #ddd;
-      padding-bottom: 0.2em;
-    }
-    
-    .extraction-item {
-      padding: 0.5em 0;
-      position: relative;
-    }
-    
-    .clip-snippet {
-      font-size: 0.9em;
-      color: #555;
-      margin: 0.2em 0;
-    }
-    
-    .extraction-divider {
+    .delete-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
       border: none;
-      border-top: 1px dashed #ccc;
-      margin: 0.8em 0;
+      color: #888;
+      cursor: pointer;
+      font-size: 18px;
+      padding: 0;
+    }
+    
+    .delete-btn:hover {
+      color: #f44336;
     }
   </style>
 </head>
@@ -154,12 +124,11 @@
     <h1>Extracted Hyperlinks</h1>
     <button id="clearAllBtn" class="clear-btn">Clear All</button>
   </div>
-  
-  <div id="clipContainer">
-    <div class="loading">Loading clipped pages...</div>
+
+  <div id="groupContainer">
+    <div class="loading">Loading extracted hyperlinks...</div>
   </div>
-  
-  <!-- Load the IndexedDB utility first -->
+
   <script src="utils/db.js"></script>
   <script src="sidebar.js"></script>
 </body>
