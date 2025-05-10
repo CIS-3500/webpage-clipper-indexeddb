@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Clipped Pages</title>
+  <title>Extracted Hyperlinks</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -87,6 +87,12 @@
       border-top: 1px solid #eee;
       padding-top: 10px;
     }
+
+    .clip-wordcount {
+      font-size: 11px;
+      color: #666;
+      margin-bottom: 8px;
+    }
     
     .delete-btn {
       position: absolute;
@@ -112,11 +118,126 @@
       color: #666;
       margin-top: 40px;
     }
+
+    .page-group {
+      margin-bottom: 2em;
+    }
+    
+    .group-title {
+      font-size: 1.3em;
+      font-weight: bold;
+      margin-bottom: 0.5em;
+      border-bottom: 2px solid #ddd;
+      padding-bottom: 0.2em;
+    }
+    
+    .extraction-item {
+      padding: 0.5em 0;
+      position: relative;
+    }
+    
+    .clip-snippet {
+      font-size: 0.9em;
+      color: #555;
+      margin: 0.2em 0;
+    }
+    
+    .extraction-divider {
+      border: none;
+      border-top: 1px dashed #ccc;
+      margin: 0.8em 0;
+    }
+
+<<<<<<< HEAD
+<<<<<<< Updated upstream
+=======
+>>>>>>> ad737f6 (Added settings selection of how to copy to clipboard, although it has no effect yet)
+    .settings-panel {
+      display: flex;
+      align-items: center;
+      gap: 0.5em;
+      margin-bottom: 1em;
+      padding: 0.5em;
+      background: #fff;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .settings-panel select {
+      padding: 4px 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+<<<<<<< HEAD
+=======
+    .group-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 1em;
+      padding: 0.2em 0;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .group-title-wrapper {
+      flex-grow: 1;
+      cursor: pointer;
+    }
+
+    .group-title-wrapper span {
+      font-size: 1em;
+      font-weight: bold;
+      user-select: none;
+      transition: color 0.2s ease;
+    }
+
+    .group-title-wrapper span.collapsed {
+      color: #777;
+    }
+
+    .group-delete-btn {
+      background: none;
+      border: none;
+      font-size: 1.3em; /* Slightly bigger than .delete-btn */
+      color: #999;
+      cursor: pointer;
+      padding: 0 8px;
+      margin-left: 10px;
+      line-height: 1;
+    }
+
+    .group-delete-btn:hover {
+      color: #c00;
+    }
+
+    .delete-btn {
+      font-size: 1em;
+      color: #bbb;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    
+>>>>>>> Stashed changes
+=======
+>>>>>>> ad737f6 (Added settings selection of how to copy to clipboard, although it has no effect yet)
   </style>
 </head>
 <body>
+  <!-- Settings panel -->
+  <div id="settings" class="settings-panel">
+    <label for="copyModeSelect"><strong>Copy mode:</strong></label>
+    <select id="copyModeSelect">
+      <option value="urls">URLs only</option>
+      <option value="labels">[Text] URL</option>
+      <option value="full">Full text + links</option>
+    </select>
+  </div>
+
   <div class="header">
-    <h1>Clipped Pages</h1>
+    <h1>Extracted Hyperlinks</h1>
     <button id="clearAllBtn" class="clear-btn">Clear All</button>
   </div>
   
