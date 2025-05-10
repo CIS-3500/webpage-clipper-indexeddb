@@ -3,121 +3,59 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Clipped Pages</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      padding: 15px;
-      background-color: #f5f5f5;
-    }
-    
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-      position: sticky;
-      top: 0;
-      background-color: #f5f5f5;
-      padding: 10px 0;
-      z-index: 10;
-    }
-    
-    h1 {
-      margin: 0;
-      font-size: 20px;
-    }
-    
-    .clear-btn {
-      background-color: #f44336;
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    
-    .no-clips {
-      text-align: center;
-      color: #666;
-      margin-top: 40px;
-    }
-    
-    .clip-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    
-    .clip-item {
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.12);
-      padding: 15px;
-      position: relative;
-    }
-    
-    .clip-title {
-      font-weight: bold;
-      margin-bottom: 5px;
-      padding-right: 25px;
-    }
-    
-    .clip-url {
-      font-size: 12px;
-      color: #1a73e8;
-      text-decoration: none;
-      word-break: break-all;
-      margin-bottom: 5px;
-      display: block;
-    }
-    
-    .clip-date {
-      font-size: 11px;
-      color: #666;
-      margin-bottom: 8px;
-    }
-    
-    .clip-content {
-      font-size: 13px;
-      color: #333;
-      line-height: 1.4;
-      margin-top: 10px;
-      border-top: 1px solid #eee;
-      padding-top: 10px;
-    }
-    
-    .delete-btn {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      background: none;
-      border: none;
-      color: #888;
-      cursor: pointer;
-      font-size: 16px;
-      padding: 0;
-      width: 20px;
-      height: 20px;
-      line-height: 1;
-    }
-    
-    .delete-btn:hover {
-      color: #f44336;
-    }
-    
-    .loading {
-      text-align: center;
-      color: #666;
-      margin-top: 40px;
-    }
-  </style>
+  <title>Extracted Hyperlinks</title>
+  <link rel="stylesheet" href="sidebar.css">
 </head>
 <body>
-  <div class="header">
-    <h1>Clipped Pages</h1>
-    <button id="clearAllBtn" class="clear-btn">Clear All</button>
+  <div class="link-extractor-titlebar">
+    Link Extractor
+  </div>
+  <div id="promptSelectorContainer" class="settings-panel">
+    <label for="promptSelector"><strong>Select a Prompt:</strong></label>
+    <select id="promptSelector">
+      <option value="">None</option>
+      <option value="summarize">Summarize these links.</option>
+      <option value="analyze">Analyze the credibility of these sources.</option>
+      <option value="compare">Compare the perspectives in these articles.</option>
+      <option value="custom">Write your own</option>
+    </select>
+  
+    <!-- This will replace the select when "Write your own" is chosen -->
+    <textarea id="customPrompt" placeholder="Enter your custom prompt..." style="display:none; width: 100%; margin-top: 8px;"></textarea>
+  </div>
+
+  <!-- Notification for copy -->
+  <div id="copyNotification" class="copy-notification" style="display:none;">Links copied to clipboard</div>
+
+  <!-- Settings panel -->
+  <div class="copy-mode-block">
+    <label style="min-width:80px;" for="copyModeSelect">Copy mode:</label>
+    <select id="copyModeSelect">
+      <option value="urls">URLs only</option>
+      <option value="labels">[Text] URL</option>
+      <option value="full">Full text + URLs</option>
+    </select>
+  
+    <div class="autocopy-toggle-container">
+      <label class="switch">
+        <input type="checkbox" id="autoCopyToggle" checked>
+        <span class="slider round"></span>
+      </label>
+      <span style="margin-left:8px; font-size:1em;">Auto-copy</span>
+    </div>
+  </div>
+  
+  <!-- original selected links button -->
+  <button id="copySelectedBtn" class="copy-selected-btn" style="margin-top: 10px;">
+    Copy Selected Links
+  </button>
+
+  <div class="extracted-hyperlinks-bar">
+    <span class="extracted-hyperlinks-title">Extracted Hyperlinks</span>
+    <div>
+      <button id="selectAllBtn" class="select-all-btn">Select All</button>
+      <button id="clearAllBtn" class="clear-btn">Clear All</button>
+    </div>
   </div>
   
   <div id="clipContainer">
